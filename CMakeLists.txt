@@ -60,6 +60,17 @@ if(GEOGRAM_WITH_TBB AND NOT TARGET TBB::tbb)
 include(cmake/onetbb.cmake)
 endif()
 
+# CUDA support for GPU-accelerated remeshing
+option(GEOGRAM_WITH_CUDA "Enable CUDA-accelerated CVT/Voronoi remeshing" OFF)
+if(GEOGRAM_WITH_CUDA)
+    enable_language(CUDA)
+    find_package(CUDAToolkit REQUIRED)
+    set(CMAKE_CUDA_ARCHITECTURES "86" CACHE STRING "CUDA architectures")
+    set(CMAKE_CUDA_STANDARD 17)
+    add_definitions(-DWITH_CUDA)
+    message(STATUS "CUDA enabled: arch=${CMAKE_CUDA_ARCHITECTURES}")
+endif()
+
 include(cmake/geogram.cmake)
 
 # Override default CMAKE_INSTALL_DOCDIR: Use doc instead of CMake default DATAROOTDIR/doc/PROJECT_NAME

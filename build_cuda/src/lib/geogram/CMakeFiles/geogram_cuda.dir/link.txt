@@ -1,0 +1,2 @@
+/usr/bin/ar qc ../../../lib/libgeogram_cuda.a CMakeFiles/geogram_cuda.dir/voronoi/cuda/cvt_cuda.cu.o
+/usr/bin/ranlib ../../../lib/libgeogram_cuda.a

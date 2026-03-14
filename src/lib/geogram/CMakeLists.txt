@@ -28,6 +28,18 @@ aux_source_directories(SOURCES "Source Files\\image"    image)
 aux_source_directories(SOURCES "Source Files\\parameterization" parameterization)
 aux_source_directories(SOURCES "Source Files\\bibliography" bibliography)
 
+# CUDA-accelerated CVT kernels and checkpoint system
+if(GEOGRAM_WITH_CUDA)
+    # CUDA kernel sources
+    set(CVT_CUDA_SOURCES
+        voronoi/cuda/cvt_cuda.cu
+        voronoi/cuda/sampling_cuda.cu
+    )
+endif()
+
+# NOTE: geo_checkpoint.cpp is compiled as part of the vorpalite executable
+# (not the geogram library) to avoid symbol visibility issues with -fvisibility=hidden
+
 if(GEOGRAM_WITH_LUA)
 aux_source_directories(SOURCES "Source Files\\lua"      lua)
 endif()
@@ -46,6 +58,21 @@ set_source_files_properties(version.h PROPERTIES GENERATED true)
 include_directories(${PROJECT_BINARY_DIR}/src/lib)
 
 add_library(geogram ${SOURCES} $<TARGET_OBJECTS:geogram_third_party>)
+
+# Build CUDA kernels as a separate static library
+if(GEOGRAM_WITH_CUDA)
+    add_library(geogram_cuda STATIC ${CVT_CUDA_SOURCES})
+    target_include_directories(geogram_cuda PRIVATE
+        ${PROJECT_SOURCE_DIR}/src/lib
+        ${PROJECT_SOURCE_DIR}/src/lib/geogram/voronoi/cuda
+    )
+    set_target_properties(geogram_cuda PROPERTIES
+        CUDA_SEPARABLE_COMPILATION ON
+        POSITION_INDEPENDENT_CODE ON
+        FOLDER "GEOGRAM"
+    )
+    target_link_libraries(geogram_cuda CUDA::cudart CUDA::curand)
+endif()
 
 target_compile_features(geogram PUBLIC cxx_std_17)
 

@@ -1,0 +1,10 @@
+prefix=/usr/local
+exec_prefix=${prefix}
+includedir=${prefix}/include/geogram1
+
+Name: geogram
+Description: fast, simple and easy-to-use primitives for geometric programming
+Version: 1.9.9-rc
+URL: https://github.com/BrunoLevy/geogram
+Libs: -lgeogram
+Cflags: -I${includedir}
